@@ -1,0 +1,10 @@
+[project]
+name = "hello-agent-class02"
+version = "0.1.0"
+description = "Building our first agent"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-genai>=1.38.0",
+    "openai-agents>=0.3.1",
+]
