@@ -14,6 +14,7 @@ client = AsyncOpenAI(
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
+
 @function_tool
 def search_weather(question: str)-> str:
     """Search the weather for the answer"""
