@@ -1,35 +1,19 @@
 from dotenv import load_dotenv
 import os
-
-from agents import Agent, Runner, OpenAIChatCompletionsModel, set_tracing_disabled, function_tool
-from openai import AsyncOpenAI
-
-
-set_tracing_disabled(True)
+from agents import function_tool
+from tavily import TavilyClient
 load_dotenv()
-api_key = os.getenv('GOOGLE_API_KEY')
+api_key = os.getenv('TAVILY_API_KEY')
 
-client = AsyncOpenAI(
-    api_key= api_key,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+
+tavily_client = TavilyClient(api_key=api_key)
 
 
 @function_tool
-def search_weather(question: str)-> str:
-    """Search the weather for the answer"""
-    print("WEATHER TOOL CALLED")
+def web_search(question: str)-> str:
+    """Search the web for answer"""
+    print("Searching web tool called")
+
+    result = tavily_client.search(f"{question}")
     
-    return f"Quetta weather is 30C today"
-
-
-@function_tool
-def math_function(question: str) ->str:
-    """give answer with proper computation"""
-    print("MATH TOOL CALLED")
-    return f"{question}"
-agent: Agent = Agent(name="Assistant", instructions="use all the tools and send question to required tool than use LLM power to answer the query base on question",model=llm, tools=[search_weather, math_function])
-
-result = Runner.run_sync(starting_agent=agent, input="formula for quadratic equ?")
-
-print(result.final_output)
+    return f"{result}"

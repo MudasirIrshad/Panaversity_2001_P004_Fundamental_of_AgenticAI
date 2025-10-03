@@ -14,7 +14,7 @@ def extract_text(image_url: str) :
 @function_tool
 def summary_tool(image_path: str):
     """Extract text from an image and summarize it."""
-    print("Called the function")
+    print("Text Tool Called")
 
     text = extract_text(image_path)
 
