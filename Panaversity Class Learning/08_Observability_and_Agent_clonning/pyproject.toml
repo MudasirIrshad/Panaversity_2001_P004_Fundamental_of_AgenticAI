@@ -1,0 +1,10 @@
+[project]
+name = "08-observability-and-agent-clonning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-genai>=1.43.0",
+    "openai-agents>=0.3.3",
+]

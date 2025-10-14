@@ -1,41 +1,33 @@
 from dotenv import load_dotenv
 import os
 
-from agents import Agent, RunConfig, RunResult, Runner, OpenAIChatCompletionsModel, set_default_openai_api, set_default_openai_client, set_tracing_disabled
+from agents import Agent, RunConfig, RunResult, Runner, OpenAIChatCompletionsModel
 from openai import AsyncOpenAI
 
 
 # Load environment variables
 load_dotenv()
 api_key = os.getenv('GOOGLE_API_KEY')
-
-# Initialize client
-
+print(api_key)
 client = AsyncOpenAI(
     api_key=api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 
-set_tracing_disabled(True)
-set_default_openai_api("chat_completions")
-set_default_openai_client(client)
-
-llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
+llm: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     model="gemini-2.5-flash",
     openai_client=client
 )
+
+
 # Define agents
 math_agent = Agent(name="Assistant", instructions="You are a Math assistant", model=llm)
 
 
-chemistry_agent = Agent(name="Assistant", instructions="You are a Chemistry assistant", model=llm)
-
-# Run a query
 result: RunResult = Runner.run_sync(
     math_agent,
-    input="Why learn math for AI agents?",
-    
+    input="Why learn math for AI agents?",    
 )
 
 print(result.final_output)
