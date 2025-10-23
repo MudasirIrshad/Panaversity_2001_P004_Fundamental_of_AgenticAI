@@ -24,74 +24,57 @@ llm: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
 @function_tool
 def get_message()->str:
     """Check and returns unread whastapp messages and share them"""
-    return "You have 1 message: 'Create a promotional facebook post and whatsapp message'"
+    return "You have 1 message: 'Create a promotional facebook post and whatsapp message for my brand EatMySnack this is a food court' "
 
-
-
-whatsapp_message: Agent = Agent(
-    name="Whatsapp message Agent",
+whatsapp_monitoring_agent: Agent = Agent(
+    name="Whatsapp Monitoring Agent",
     instructions=(
-        "You are a WhatsApp message monitoring and task-delegating agent.\n\n"
-        "Use the 'get_message' tool to check for new messages.\n"
-        "Then decide what to do:\n"
-        "1. If the message requests a **Facebook promotional post**, "
-        "handoff to the **Facebook Content Writer Agent**.\n"
-        "2. If the message requests a **WhatsApp promotional message**, "
-        "handoff to the **WhatsApp Promotional Message Writer Agent**.\n"
-        "3. If both are requested, handle both via the appropriate handoffs.\n\n"
-        "Be explicit in your reasoning when deciding which handoff to use."
-        "After both tasks are done, combine their results into a final summary and return that as the final output."
+        "Use the 'get_message' tool to check for unread WhatsApp messages.\n\n"
+        "If the message requests both Facebook and WhatsApp content:\n"
+        "1 First, handoff to the **Social Media Agent**.\n"
+        "2 After getting that result, handoff to the **WhatsApp Messaging Agent**.\n"
+        "3 When both responses are received, combine them into a clear final answer and return it.\n\n"
+        "If only one type is requested, just handoff to that single agent."
     ),
-    model=llm,
     tools=[get_message],
-    handoff_description="Checks WhatsApp messages and delegates to content writers."
+    model=llm
 )
-facebook_content_wirter: Agent = Agent(
-    name="Facebook Content Writer Agent",
+
+whatsapp_messaging_agent: Agent =Agent(
+    name="Whatsapp Messaging Agent",
+    instructions= (
+        "Write a short, catchy promotional WhatsApp message for the given topic or brand.\n"
+        "Keep it friendly and concise.\n"
+        "After writing, return the message as your final output whatsapp montoring agent (do not hand off)."
+   
+    ),
+    handoff_description="Used for generating whatsapp message base on the topic",
+    model=llm
+)
+
+social_media_agent : Agent = Agent(
+    name="Social media agent",
+    handoff_description="Used to generate social media content based on topic",
     instructions=(
-        "write a facebook promotional content given by whatsapp_message"
-        "After writing the post, return it as your final output (do not hand off)."
-        ),
-    model=llm,
-    handoffs=[whatsapp_message]
-)
-whatsapp_promotional_wirter: Agent = Agent(
-    name="Whatsapp promotional message Writer Agent",
-    instructions=(
-        "write a whatsapp promotional message given by whatsapp_message"
-        "After writing the message, return it as your final output (do not hand off)."
-        ),
-    model=llm,
-    handoffs=[whatsapp_message]
+        "Write a promotional Facebook or social media post for the given brand or topic.\n"
+        "Make it creative and engaging.\n"
+        "After writing, return the post as your final output to whatsapp montoring agent (do not hand off)."
+        "NOTE: You cant produce whatsapp related content for that handoff your output to whatsapp montoring agent and it will handoff to whatsapp message agent"
+    ),
+    model=llm
 )
 
-whatsapp_message.handoffs = [facebook_content_wirter, whatsapp_promotional_wirter]
+whatsapp_monitoring_agent.handoffs= [social_media_agent, whatsapp_messaging_agent]
+social_media_agent.handoffs = [whatsapp_monitoring_agent]
+whatsapp_messaging_agent.handoffs = [whatsapp_monitoring_agent]
 
-
-# Its upon us to use Orchestrator Agent or do handsoff directly
-# orchestrator_agent: Agent = Agent(
-#     name="Orchestrator Agent",
-#     instructions="You are my assistant",
-#     model=llm,
-#     handoffs=[whatsapp_message, facebook_content_wirter]
-# )
-
-
-
-
-result = Runner.run_sync(
-    # input="""Salam""",
-    input="""
-    I am making a product named ShoeBurner:
-    
-    2. Write a short facebook post content for promotion. and need a whatsapp message too for that.
-    """,
-    starting_agent=whatsapp_message
+runner  = Runner.run_sync(
+    starting_agent=whatsapp_monitoring_agent,
+    input=""
 )
 
-print(result.final_output)
-print("\n\n\n",result.last_agent.name)
-
+print(runner.final_output)
+print(runner.last_agent.name)
 
 
 # tutorial_generator = Agent(
