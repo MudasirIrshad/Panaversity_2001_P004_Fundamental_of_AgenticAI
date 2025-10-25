@@ -21,7 +21,8 @@ llm: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
 )
 
 
-# 2 DIFFERENT AGENT EXAMPLE
+# 2 DIFFERENT AGENT EXAMPLE un comment any one to test
+
 # tutorial_generator = Agent(
 #     name="Tutorial Generator",
 #     instructions=(
