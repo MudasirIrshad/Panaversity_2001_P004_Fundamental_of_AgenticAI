@@ -20,6 +20,44 @@ llm: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     openai_client=client
 )
 
+# 2 DIFFERENT AGENT EXAMPLE
+# tutorial_generator = Agent(
+#     name="Tutorial Generator",
+#     instructions=(
+#         "Given a programming topic and an outline, your job is to generate code snippets for each section of the outline."
+#         "format the tutorial in markdown using a mix of text for explanation and code snippets for examples."
+#         "Where it makes sense, include comments in the code snippets to further explain the code."
+#         "After making the tutorial hand it to the outline builder agent."
+#     ),
+#     tools=[],
+#     model=llm
+# )
+
+
+# outline_builder = Agent(
+#     name="Outline Builder",
+#     instructions=(
+#         "Given a particular programming topic, your job is to help come up with a tutorial.You will do that by crafting an outline"
+#         "After making the outline hand it to the tutorial generator agent."
+#         "After handing to the tutorial generator, the tutorial generator give back its response to you and you have to craft ending outline for that."
+#         "After receiving the tutorial back, summarize it briefly as a final conclusion and return that as the final output."
+#     ),
+#     handoffs=[tutorial_generator],
+#     model=llm
+# )
+
+# tutorial_generator.handoffs = [outline_builder]
+
+# runner = Runner.run_sync(
+#     starting_agent=outline_builder, 
+#     input="Loops in Java"
+# )
+
+# print(runner.final_output)
+# print(runner.last_agent.name)
+
+
+# 3 DIFFERENT AGENTS EXAMPLE
 
 @function_tool
 def get_message()->str:
@@ -75,39 +113,3 @@ runner  = Runner.run_sync(
 
 print(runner.final_output)
 print(runner.last_agent.name)
-
-
-# tutorial_generator = Agent(
-#     name="Tutorial Generator",
-#     instructions=(
-#         "Given a programming topic and an outline, your job is to generate code snippets for each section of the outline."
-#         "format the tutorial in markdown using a mix of text for explanation and code snippets for examples."
-#         "Where it makes sense, include comments in the code snippets to further explain the code."
-#         "After making the tutorial hand it to the outline builder agent."
-#     ),
-#     tools=[],
-#     model=llm
-# )
-
-
-# outline_builder = Agent(
-#     name="Outline Builder",
-#     instructions=(
-#         "Given a particular programming topic, your job is to help come up with a tutorial.You will do that by crafting an outline"
-#         "After making the outline hand it to the tutorial generator agent."
-#         "After handing to the tutorial generator, the tutorial generator give back its response to you and you have to craft ending outline for that."
-#         "After receiving the tutorial back, summarize it briefly as a final conclusion and return that as the final output."
-#     ),
-#     handoffs=[tutorial_generator],
-#     model=llm
-# )
-
-# tutorial_generator.handoffs = [outline_builder]
-
-# runner = Runner.run_sync(
-#     starting_agent=outline_builder, 
-#     input="Loops in Java"
-# )
-
-# print(runner.final_output)
-# print(runner.last_agent.name)
