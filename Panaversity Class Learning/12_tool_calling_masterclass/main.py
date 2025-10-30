@@ -27,6 +27,7 @@ agent = Agent(name="Assistant", instructions="You are a Math assistant", model=l
 
 # Run a query
 result: RunResult = Runner.run_sync(
+    
     starting_agent=agent,
     input="Why learn math for AI agents?",
     
