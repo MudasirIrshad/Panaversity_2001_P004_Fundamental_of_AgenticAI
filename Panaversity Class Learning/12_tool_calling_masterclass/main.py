@@ -22,14 +22,12 @@ llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     openai_client=client
 )
 # Define agents
-math_agent = Agent(name="Assistant", instructions="You are a Math assistant", model=llm)
+agent = Agent(name="Assistant", instructions="You are a Math assistant", model=llm)
 
-
-chemistry_agent = Agent(name="Assistant", instructions="You are a Chemistry assistant", model=llm)
 
 # Run a query
 result: RunResult = Runner.run_sync(
-    math_agent,
+    starting_agent=agent,
     input="Why learn math for AI agents?",
     
 )
