@@ -62,22 +62,47 @@ llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
 # print(result.final_output)
 
 
-# Example 2
-@dataclass
-class user_info:
-    is_study_session: bool
+# # Example 2
+# @dataclass
+# class user_info:
+#     is_study_session: bool
 
 
-def check_boolean(user_context: RunContextWrapper[user_info], agent: Agent)->bool: 
-    return not user_context.context.is_study_session
+# def check_boolean(user_context: RunContextWrapper[user_info], agent: Agent)->bool: 
+#     return not user_context.context.is_study_session
 
 
-@function_tool(is_enabled=check_boolean) # type: ignore
-def search_google(query: str)->str:
-    print("Google Search TOOL")
-    return f"Searching google for query: {query}"
+# @function_tool(is_enabled=check_boolean) # type: ignore
+# def search_google(query: str)->str:
+#     print("Google Search TOOL")
+#     return f"Searching google for query: {query}"
 
-# is_enabled: bool | ((RunContextWrapper[Any], AgentBase[Any]) -> MaybeAwaitable[bool]) = True
+# agent: Agent = Agent(
+#     name="Study Agent",
+#     model=llm,
+#     tools=[search_google]
+# )
+
+# user_context = user_info(is_study_session=False)
+
+# runner = Runner.run_sync(
+#     starting_agent=agent,
+#     input="Search google for Who is Obama?",
+#     context=user_context
+# )
+
+# print(runner.final_output)
+
+
+
+
+# Handling Errors in TOOL CALLING
+
+@function_tool
+def search_google(query: str):
+    print("\nGoogle Search TOOL\n")
+    print(ValueError("Unable to use this tool"))
+    raise ValueError("Unsble to call tool search")
 
 agent: Agent = Agent(
     name="Study Agent",
@@ -85,12 +110,10 @@ agent: Agent = Agent(
     tools=[search_google]
 )
 
-user_context = user_info(is_study_session=False)
 
 runner = Runner.run_sync(
     starting_agent=agent,
     input="Search google for Who is Obama?",
-    context=user_context
 )
 
 print(runner.final_output)
