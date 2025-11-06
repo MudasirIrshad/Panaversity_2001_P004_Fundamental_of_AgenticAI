@@ -22,14 +22,26 @@ llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     openai_client=client
 )
 # Define agents
-agent = Agent(name="Assistant", instructions="You are a Math assistant", model=llm)
+poet_agent = Agent(
+    name="Poet Agent", 
+    instructions="You are an AI poet. Your task is to write poem about a given topic", 
+    model=llm,
+    handoff_description="I can tell you a poem about the given topic"
+    )
 
+assistant_agent = Agent(
+    name="Assistant",
+    model=llm,
+    handoffs=[poet_agent],
+    instructions="you are an AI assistant. Your task is to answer the given question. If uer wants a poem, you can ask Poet Agent to write a poem about a given topic"
+    )
 
 # Run a query
 result: RunResult = Runner.run_sync(
-    starting_agent=agent,
-    input="Why learn math for AI agents?",
+    starting_agent=assistant_agent,
+    input="Write a poem about LM Arena the AI models",
     
 )
 
+print(result.last_agent.name)
 print(result.final_output)
