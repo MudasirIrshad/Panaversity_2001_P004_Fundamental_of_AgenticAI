@@ -41,15 +41,16 @@ math_expert_agent: Agent = Agent(
 class user_info:
     name: str
 
+premium_users = ["Mudasir", "Alice", "Bob"]
 
 def test_access(user_context:RunContextWrapper, agent:Agent) -> bool:
-    return True if user_context.context.name == "Mudasir" else False
+    return True if user_context.context.name in premium_users else False
 
 assistant_agent = Agent(
     name="Assistant",
     model=llm,
     handoffs=[handoff(poet_agent, is_enabled=test_access)],
-    instructions="you are an AI assistant. Your task is to answer the given question. If user wants a poem, you can ask Poet Agent to write a poem about a given topic",
+    instructions="you are an AI assistant. Your task is to answer the given question. If user wants a poem, you can ask Poet Agent to write a poem about a given topic. Only premium users can access Poet Agent, simple users must get notified to get premium account to write a poem.",
     )
 # Run a query
 user_name = input("Enter your name: ")
