@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from dotenv import load_dotenv
 import os
 
-from agents import Agent, RunConfig, RunResult, Runner, OpenAIChatCompletionsModel, handoff
+from agents import Agent, RunConfig, RunContextWrapper, RunResult, Runner, OpenAIChatCompletionsModel, handoff
 from openai import AsyncOpenAI
 
 
@@ -36,18 +37,29 @@ math_expert_agent: Agent = Agent(
     handoff_description="I can solve the given math problem"
 )
 
+@dataclass
+class user_info:
+    name: str
+
+
+def test_access(user_context:RunContextWrapper, agent:Agent) -> bool:
+    return True if user_context.context.name == "Mudasir" else False
+
 assistant_agent = Agent(
     name="Assistant",
     model=llm,
-    handoffs=[handoff(poet_agent, tool_name_override='poetry_maker_expert')],
-    instructions="you are an AI assistant. Your task is to answer the given question. If user wants a poem, you can ask Poet Agent to write a poem about a given topic"
+    handoffs=[handoff(poet_agent, is_enabled=test_access)],
+    instructions="you are an AI assistant. Your task is to answer the given question. If user wants a poem, you can ask Poet Agent to write a poem about a given topic",
     )
-
 # Run a query
+user_name = input("Enter your name: ")
+
+user_context = user_info(name=user_name)
+
 result: RunResult = Runner.run_sync(
     starting_agent=assistant_agent,
-    input="Write a urdu poem on mirza ghalib, the text could be in roman urdu",
-    
+    input="share a poem about Mirza Ghalib",
+    context=user_context
 )
 
 print(result.last_agent.name)
