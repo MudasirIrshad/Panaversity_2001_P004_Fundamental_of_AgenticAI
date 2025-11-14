@@ -23,10 +23,10 @@ llm: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
 
 
 class Skill(BaseModel):
-    skill_name: str
-    description: str
-    level: str
-    experience: int
+    skill_name: str | None
+    description: str| None
+    level: str| None
+    experience: int| None
 
 class Userprofile(BaseModel):
     name: str
@@ -43,7 +43,7 @@ agent = Agent(
 
 result: RunResult = Runner.run_sync(
     starting_agent=agent,
-    input="I am John Doe, 30 years old, and my email is john, i am a AI enginner and i think i am a bit good not too good in this",
+    input="I am John Doe, 30 years old, and my email is john@gmail.com",
 )
 
 print(result.final_output)
