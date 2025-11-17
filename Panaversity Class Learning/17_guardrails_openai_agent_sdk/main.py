@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 import os
 
-from agents import Agent, GuardrailFunctionOutput, RunConfig, RunContextWrapper, RunResult, Runner, OpenAIChatCompletionsModel, TResponseInputItem, input_guardrail
+from agents import Agent, GuardrailFunctionOutput, InputGuardrailTripwireTriggered, RunConfig, RunContextWrapper, RunResult, Runner, OpenAIChatCompletionsModel, TResponseInputItem, input_guardrail
 from openai import AsyncOpenAI
+from pydantic import BaseModel
 
 # Load environment variables
 
@@ -20,13 +21,31 @@ llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     model="gemini-2.5-flash",
     openai_client=client
 )
+guardrail_llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
+    model="gemini-2.0-flash-lite",
+    openai_client=client
+)
+
+
+class ProductGuardrailOutput(BaseModel):
+    is_not_product_related: bool
+    reason: str
 
 
 # Define guardrail agent
 guardrail_agent: Agent = Agent(
     name="Guardrail Agent",
-    model=llm,
-    instructions="You are a guardrail agent that ensures user queries are safe and appropriate. user must not asked about pakistan law and regulations or anything related to that.",
+    model=guardrail_llm,
+    instructions="check if the user query is not related to ecommerce knowledge, business ideas or any product related information.",
+    # instructions="""
+    # You evaluate if a user query is any ecommerce product, price, ecommerce, or business ideas.
+    # Return:
+    # - is_not_product_related = false  → Only if the query is about ecommerce product, price, ecommerce, or business ideas.
+    # - is_not_product_related = true → For all other queries.
+
+    # Be strict and literal. Do NOT mark normal questions about history, politics, religion, America, or general topics as related to ecommerce product, price, ecommerce, or business ideas..
+    # """,
+    output_type=ProductGuardrailOutput,
 )
 
 
@@ -38,9 +57,15 @@ async def user_query_guardrail(context: RunContextWrapper[None], agent: Agent,us
         context=context.context
     )
 
+    print("Guardrail Output:", result.final_output, "is product related?", not result.final_output.is_not_product_related)
+
+    if(result.final_output.is_not_product_related):
+        print("Guardrail triggered: Query is not product related.")
+    
+
     return GuardrailFunctionOutput(
         output_info=result.final_output,
-        tripwire_triggered=result.final_output != "Input is safe."
+        tripwire_triggered=result.final_output.is_not_product_related
     )
 
 # Define agents
@@ -49,14 +74,19 @@ customer_support_agent: Agent = Agent(
     name="Customer Support Agent",
     model=llm,
     instructions="You are a helpful customer support agent for our software company.",
+    input_guardrails=[user_query_guardrail],
 )
 
 # Run a query
 
-result: RunResult = Runner.run_sync(
-    starting_agent=customer_support_agent,
-    input="what is 2+2?",
+try:
+    result: RunResult = Runner.run_sync(
+        starting_agent=customer_support_agent,
+        # input="how to grow a product in ecommerce?",
+        input="Who was the first president of the United States?",
 
-)
+    )
 
-print(result.final_output)
+    print(result.final_output)
+except InputGuardrailTripwireTriggered as e:
+    print("Product related guardrail triggered:", str(e))
