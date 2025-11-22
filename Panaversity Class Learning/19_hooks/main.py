@@ -59,13 +59,13 @@ class MyAgentHooks(AgentHooks):
 
 
 
-
 # Define agents
 
 urdu_agent = Agent(
     name="urdu_agent", 
     instructions="You translate the user input into Urdu and respond the translation in Roman urdu only", 
-    model=llm
+    model=llm,
+    hooks=MyAgentHooks()
     )
 
 customer_support_agent = Agent(
