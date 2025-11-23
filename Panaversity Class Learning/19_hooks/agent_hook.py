@@ -31,7 +31,11 @@ class MyAgentHooks(AgentHooks):
         print(f"\n[HOOK]Agent {agent.name} is starting. \n")
 
 
-    async def on_end(self, agent, context):
+    async def on_end(self,
+        context,
+        agent,
+        output
+        ) -> None:
         print(f"\n[HOOK]Agent {agent.name} finished \n")
 
     async def on_handoff(self, context, agent, source) -> None:
@@ -59,7 +63,7 @@ class MyAgentHooks(AgentHooks):
 
 
 
-# Define agents
+# Define agents with AGENT Hooks
 
 urdu_agent = Agent(
     name="urdu_agent", 
