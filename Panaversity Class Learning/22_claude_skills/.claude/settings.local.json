@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir \".claude\\\\skills\\\\image-generation\" /s)"
+      "Bash(dir \".claude\\\\skills\\\\image-generation\" /s)",
+      "Bash(dir \"C:\\\\Users\\\\DEll\\\\.claude-code-router\" /s)"
     ]
   }
 }
