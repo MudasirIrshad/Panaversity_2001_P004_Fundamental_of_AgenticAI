@@ -33,7 +33,7 @@ async def main():
     # Create session using database URL
     session = SQLAlchemySession.from_url(
     "user-123",
-    url="postgresql+asyncpg://neondb_owner:npg_2LRcdMjrpKS8@ep-patient-unit-a4lhampy-pooler.us-east-1.aws.neon.tech/neondb",
+    url="NEON URL",
     create_tables=True,
     engine_kwargs={
         "connect_args": {
