@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 import chainlit as cl
-from agents import Agent, RunConfig, RunResult, Runner, OpenAIChatCompletionsModel
+from agents import Agent, RunConfig, RunResult, Runner, OpenAIChatCompletionsModel, SQLiteSession
 from openai import AsyncOpenAI
 
 
@@ -15,6 +15,8 @@ client = AsyncOpenAI(
     api_key=api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
+
+session_storage = SQLiteSession("user_123","conversation_123.db")
 
 
 llm : OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
@@ -38,6 +40,7 @@ async def main(message: cl.Message):
     result: RunResult = await Runner.run(
         starting_agent=agent,
         input=message.content,
+        session=session_storage,
     )
 
     msg.content = f"AGENT: {result.final_output}"
