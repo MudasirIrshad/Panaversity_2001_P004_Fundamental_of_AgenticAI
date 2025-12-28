@@ -41,9 +41,8 @@ def essay_writer(topic: str) -> str:
 
 agent : Agent = Agent(
     name="Assistant",
-    instructions="You are an AI assistant that helps users with their questions before answering any question you need to check all the tools available and use them appropriately. Always use 'get_greeting' tool to greet users, Use essay_writer tool to write essays.",
+    instructions="You are an AI assistant designed to help users with their questions in a clear and friendly way.",
     model=llm,
-    tools=[get_greeting, essay_writer],
 )
 
 
